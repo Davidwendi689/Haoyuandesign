@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>甘文棣 · Gan Wendi — 个人简历</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;900&family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@500;700;900&display=swap" rel="stylesheet" />
+<style>
+/* === 设计变量：黑底 / 白字 / 瑞士红 === */
+:root{
+  --paper:#0E0E10;
+  --ink:#F2EFE8;
+  --red:#E4002B;
+  --line:rgba(242,239,232,.14);
+  --muted:rgba(242,239,232,.55);
+  --serif-cn:"Noto Serif SC", serif;
+  --sans-cn:"Noto Sans SC", sans-serif;
+  --sans-en:"Archivo", sans-serif;
+}
+
+/* === 基础 === */
+*{ box-sizing:border-box; margin:0; padding:0; }
+html{ scroll-behavior:smooth; }
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--sans-cn);
+  font-weight:400;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+.hl{ color:var(--red); }
+
+/* === 动态闪烁背景层（偏红虚化光晕，明暗呼吸闪烁） === */
+.ambient{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+.ambient .b{ position:absolute; border-radius:50%; filter:blur(60px); will-change:opacity,transform; }
+.ambient .b1{ width:26vw; height:26vw; background:#FF2247; left:-6vw; top:8vh; opacity:.18; animation:flicker1 3.6s ease-in-out infinite; }
+.ambient .b2{ width:22vw; height:22vw; background:#FF2247; right:-5vw; bottom:4vh; opacity:.14; animation:flicker2 4.4s ease-in-out infinite; }
+@keyframes flicker1{
+  0%{opacity:.10; transform:scale(1);}
+  15%{opacity:.26; transform:scale(1.04);}
+  30%{opacity:.14;}
+  45%{opacity:.30; transform:scale(1.07);}
+  60%{opacity:.16;}
+  75%{opacity:.24; transform:scale(1.03);}
+  90%{opacity:.12;}
+  100%{opacity:.20; transform:scale(1);}
+}
+@keyframes flicker2{
+  0%{opacity:.16; transform:scale(1);}
+  12%{opacity:.28; transform:scale(1.05);}
+  28%{opacity:.12;}
+  42%{opacity:.26; transform:scale(1.06);}
+  58%{opacity:.15;}
+  72%{opacity:.22; transform:scale(1.03);}
+  88%{opacity:.11;}
+  100%{opacity:.18; transform:scale(1);}
+}
+
+/* === 12 列网格背景层 === */
+.grid-bg{ position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:linear-gradient(90deg, rgba(242,239,232,.06) 1px, transparent 1px);
+  background-size:calc(100vw / 12) 100%; }
+.wrap{ position:relative; z-index:1; max-width:1240px; margin:0 auto; padding:0 40px; }
+
+/* === 顶部导航 === */
+.nav{ display:flex; justify-content:space-between; align-items:center; padding:26px 0; border-bottom:1px solid var(--ink);
+  font-size:12px; letter-spacing:.2em; text-transform:uppercase; }
+.nav .mark{ font-family:var(--serif-cn); font-weight:900; font-size:18px; letter-spacing:.04em; }
+.nav .mark .r{ color:var(--red); }
+.nav .tag{ font-family:var(--sans-en); color:var(--muted); }
+
+/* === 英雄区：左文右球 === */
+.hero{
+  position:relative;
+  display:grid;
+  grid-template-columns:1.35fr .65fr;
+  gap:40px;
+  align-items:start;
+  padding:9vh 0 7vh;
+}
+.hero-main{ position:relative; z-index:2; }
+.hero-side{ position:relative; z-index:1; min-height:420px; display:flex; justify-content:center; align-items:flex-start; padding-top:8vh; }
+
+.ring{
+  position:absolute; width:clamp(180px,24vw,340px); height:clamp(180px,24vw,340px);
+  border:1px solid var(--red); border-radius:50%; right:10%; top:6%; z-index:0;
+  animation:spin 40s linear infinite; }
+.ring::after{ content:""; position:absolute; inset:18%; border:1px solid var(--line); border-radius:50%; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+/* 固定小红球：始终在页面下方，随滚动逐渐变大（后期可加动态） */
+.red-ball{
+  position:fixed; right:4.5vw; bottom:5.5vh; z-index:3;
+  width:clamp(110px,13vw,180px); height:clamp(110px,13vw,180px);
+  border-radius:50%;
+  background:radial-gradient(circle at 30% 30%, #FF3355, var(--red) 55%, #9E001E 100%);
+  box-shadow:0 0 80px rgba(228,0,43,.35), inset 0 0 40px rgba(0,0,0,.25);
+  will-change:transform;
+  transform:scale(var(--bs,1));
+  transition:transform .3s cubic-bezier(.2,.7,.3,1);
+  pointer-events:none;
+}
+
+/* 跟随鼠标红球：仅在项目经历区块起向下方显示，lerp 平滑跟随 */
+.cursor-dot{
+  position:fixed; left:0; top:0; z-index:6;
+  width:18px; height:18px; border-radius:50%;
+  background:radial-gradient(circle at 30% 30%, #FF3355, var(--red) 60%, #9E001E 100%);
+  box-shadow:0 0 30px rgba(228,0,43,.6);
+  transform:translate(-50%,-50%);
+  opacity:0; transition:opacity .4s ease;
+  pointer-events:none; will-change:transform;
+}
+.cursor-dot.show{ opacity:1; }
+
+.eyebrow{ font-family:var(--sans-en); font-size:11px; letter-spacing:.32em; text-transform:uppercase; color:var(--muted); margin-bottom:24px; }
+
+/* 姓名：中文在上、英文在下 */
+.name{ position:relative; z-index:1; line-height:.92; }
+.name .cn{
+  display:block;
+  font-family:var(--serif-cn); font-weight:900;
+  font-size:clamp(52px,11vw,158px); letter-spacing:.02em;
+  color:var(--ink);
+}
+.name .en{
+  display:block;
+  font-family:var(--sans-en); font-weight:700;
+  font-size:clamp(18px,2.8vw,42px); letter-spacing:.02em;
+  text-transform:uppercase; line-height:1.1;
+  color:var(--muted); margin-top:.3em;
+}
+
+/* 红字英文行：粗体、大写、随首屏下滑整行横向滚动变中文 */
+.tagline{
+  position:relative; z-index:1;
+  display:inline-block;
+  margin-top:22px;
+  font-family:var(--sans-en); font-weight:900;
+  font-size:clamp(26px,5.6vw,84px);
+  letter-spacing:.04em;
+  line-height:1.1;
+  text-transform:uppercase;
+  color:var(--red);
+  cursor:default;
+  will-change:transform;
+}
+.tagline .en-text,
+.tagline .cn-text{ display:inline-block; white-space:nowrap; will-change:transform, opacity; }
+.tagline .cn-text{
+  position:absolute; left:0; top:0;
+  font-family:var(--serif-cn); font-weight:900;
+  font-size:clamp(44px,8vw,118px); letter-spacing:.04em;
+  text-transform:none; white-space:nowrap;
+  color:var(--red);
+  opacity:0;
+  pointer-events:none;
+}
+
+.role{ position:relative; z-index:1; margin-top:28px; font-size:clamp(15px,1.8vw,20px); font-weight:500; max-width:34ch; color:var(--muted); }
+.role b{ color:var(--ink); font-weight:700; }
+
+/* 英雄底部：红点标签条 + 坐标 */
+.hero-foot{ position:relative; z-index:1; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:18px 30px; margin-top:46px; padding-top:22px; border-top:1px solid var(--line); }
+.hero-foot .hftags{ display:flex; flex-wrap:wrap; gap:10px 22px; }
+.hero-foot .hftags span{ font-family:var(--sans-en); font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); }
+.hero-foot .hftags span::before{ content:"●"; color:var(--red); margin-right:9px; font-size:8px; vertical-align:middle; }
+.coord{ font-family:var(--sans-en); font-size:12px; letter-spacing:.14em; color:var(--muted); text-align:right; line-height:1.7; }
+
+/* 抬头联系方式条 */
+.contact{ position:relative; z-index:1; display:flex; flex-wrap:wrap; gap:14px 28px; margin-top:26px; padding-top:20px; font-size:12px; letter-spacing:.04em; }
+.contact .ci{ display:flex; align-items:baseline; gap:8px; transition:transform .2s cubic-bezier(.2,.7,.3,1); }
+.contact .ck{ font-family:var(--sans-en); font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--red); }
+.contact .cv{ color:var(--muted); }
+.contact .cv a{ color:var(--muted); text-decoration:none; border-bottom:1px solid transparent; transition:border-color .3s, color .3s; }
+.contact .cv a:hover{ color:var(--ink); border-color:var(--red); }
+
+/* === 区块通用：标题靠左、右侧留白 === */
+section{ position:relative; z-index:1; padding:5vh 0 2vh; }
+.sec-head{ display:flex; justify-content:flex-start; align-items:baseline; gap:16px; border-top:2px solid var(--ink); padding-top:26px; }
+.sec-head .idx{ font-family:var(--sans-en); color:var(--red); font-size:13px; letter-spacing:.1em; font-weight:700; }
+.sec-head h2{ font-family:var(--serif-cn); font-weight:900; font-size:clamp(26px,4vw,42px); letter-spacing:.02em; }
+.sec-head .en{ font-family:var(--sans-en); font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+
+/* === 教育背景：左侧文字 + 右侧圆框头像 === */
+.edu{ margin-top:34px; display:grid; grid-template-columns:1fr auto; gap:40px; align-items:center; }
+.edu .line{ display:flex; flex-wrap:wrap; align-items:baseline; gap:14px 22px; padding:18px 0; border-bottom:1px solid var(--line); }
+.edu .school{ font-family:var(--serif-cn); font-weight:700; font-size:clamp(22px,3vw,32px); }
+.edu .major{ font-size:clamp(16px,2vw,20px); color:var(--muted); }
+.edu .major b{ color:var(--ink); font-weight:700; }
+.edu .status{ font-family:var(--sans-en); font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--red); margin-left:auto; }
+.edu-photo{ width:clamp(110px,13vw,180px); height:clamp(110px,13vw,180px); border-radius:50%; overflow:hidden; border:2px solid var(--red); box-shadow:0 0 50px rgba(228,0,43,.28); flex-shrink:0; }
+.edu-photo img{ width:100%; height:100%; object-fit:cover; object-position:center top; }
+
+/* === 专业技能 === */
+.skills{ display:grid; grid-template-columns:repeat(3,1fr); border:1px solid var(--ink); margin-top:34px; }
+.skill{ padding:34px 30px; min-height:180px; border-right:1px solid var(--line); display:flex; flex-direction:column; transition:background .3s, transform .25s cubic-bezier(.2,.7,.3,1); }
+.skill:last-child{ border-right:none; }
+.skill:hover{ background:rgba(228,0,43,.10); }
+/* 鼠标靠近：闪烁冲突（红底白字 ↔ 白底红字） + 轻微磁吸 */
+.skill.active{ background:var(--red); color:var(--ink); animation:skillFlicker .55s steps(1,end) 1 forwards; }
+.skill.active h3, .skill.active .k, .skill.active p{ color:var(--ink); }
+/* 靠近时闪几下（红↔黑），随后定格在红色背景白字，直到鼠标离开 */
+@keyframes skillFlicker{
+  0%   { background:var(--ink); }
+  25%  { background:var(--red); }
+  50%  { background:var(--ink); }
+  75%  { background:var(--red); }
+  100% { background:var(--red); }
+}
+.skill .k{ font-family:var(--sans-en); font-size:12px; letter-spacing:.14em; color:var(--red); font-weight:700; }
+.skill h3{ font-family:var(--serif-cn); font-weight:700; font-size:24px; margin-top:14px; }
+.skill p{ font-size:14px; color:var(--muted); margin-top:12px; line-height:1.6; }
+
+/* === 经历条目 === */
+.xp{ margin-top:34px; padding:22px 0; border-bottom:1px solid var(--line); }
+.xp .t{ font-family:var(--serif-cn); font-weight:700; font-size:clamp(20px,2.6vw,28px); }
+.xp .t b{ color:var(--red); }
+.xp .d{ font-size:15px; color:var(--muted); margin-top:10px; max-width:60ch; }
+
+/* === 项目经历 === */
+.proj{ margin-top:30px; }
+.proj .item{ display:grid; grid-template-columns:64px 1fr; gap:22px; padding:26px 0; border-bottom:1px solid var(--line); align-items:start; }
+.proj .no{ font-family:var(--sans-en); font-weight:700; font-size:26px; color:var(--red); line-height:1; }
+.proj h3{ font-family:var(--serif-cn); font-weight:700; font-size:clamp(19px,2.4vw,26px); }
+.proj h3 .en{ font-family:var(--sans-en); font-weight:500; color:var(--muted); font-size:.7em; letter-spacing:.02em; }
+.proj .desc{ font-size:15px; color:var(--muted); margin-top:10px; max-width:64ch; line-height:1.7; }
+.proj .desc b{ color:var(--ink); font-weight:700; }
+.proj .tags{ display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+.proj .tags span{ font-family:var(--sans-en); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted);
+  border:1px solid var(--line); padding:5px 11px; }
+
+/* === 获奖与证书 === */
+.awards{ margin-top:32px; }
+.award-line{ display:flex; flex-wrap:wrap; align-items:baseline; gap:12px 20px; padding:18px 0; border-bottom:1px solid var(--line); }
+.award-line .t{ font-family:var(--serif-cn); font-weight:700; font-size:clamp(18px,2.4vw,24px); }
+.award-line .t b{ color:var(--red); }
+.award-line .note{ font-size:14px; color:var(--muted); }
+/* 横向滚动证书区 */
+.cert-scroll{ display:flex; gap:18px; margin-top:26px; padding-bottom:14px; overflow-x:auto; scrollbar-width:thin; scrollbar-color:var(--red) transparent; }
+.cert-scroll::-webkit-scrollbar{ height:6px; }
+.cert-scroll::-webkit-scrollbar-thumb{ background:var(--red); }
+.cert{ flex:0 0 220px; height:280px; border:1px solid var(--line); position:relative; overflow:hidden;
+  display:flex; flex-direction:column; justify-content:space-between; padding:20px; transition:border-color .3s, transform .3s; }
+.cert::before{
+  content:""; position:absolute; inset:0; z-index:1;
+  background:linear-gradient(180deg, rgba(14,14,16,.88) 0%, transparent 35%, transparent 68%, rgba(14,14,16,.92) 100%);
+  pointer-events:none;
+}
+.cert img{
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0;
+  transition:transform .4s ease;
+}
+.cert:hover{ border-color:var(--red); transform:translateY(-4px); }
+.cert:hover img{ transform:scale(1.05); }
+.cert .ct{ position:relative; z-index:2; font-family:var(--sans-en); font-size:11px; letter-spacing:.14em; color:var(--red); text-transform:uppercase; }
+.cert .cm{ position:relative; z-index:2; font-family:var(--serif-cn); font-weight:700; font-size:18px; line-height:1.4; color:var(--ink); }
+.cert .cb{ position:relative; z-index:2; font-family:var(--sans-en); font-size:11px; letter-spacing:.12em; color:var(--muted); text-transform:uppercase; }
+.cert .ph{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:0;
+  font-family:var(--sans-en); font-size:13px; letter-spacing:.24em; color:var(--muted); text-transform:uppercase;
+  background:repeating-linear-gradient(45deg, transparent 0 14px, rgba(228,0,43,.04) 14px 28px); }
+
+/* === 红色信条页脚 === */
+.creed{ position:relative; z-index:1; background:var(--red); color:var(--ink); margin-top:7vh; }
+.creed .wrap{ padding-top:12vh; padding-bottom:12vh; }
+.creed .big{ font-family:var(--serif-cn); font-weight:900; font-size:clamp(40px,8vw,108px); line-height:.95; letter-spacing:.02em; }
+.creed .sub{ margin-top:28px; font-family:var(--sans-en); font-size:13px; letter-spacing:.22em; text-transform:uppercase; opacity:.9; }
+.creed .foot-contact{ margin-top:30px; font-size:13px; color:var(--ink); opacity:.92; display:flex; flex-wrap:wrap; gap:8px 26px; }
+.creed .ack{ margin-top:34px; padding-top:18px; border-top:1px solid rgba(242,239,232,.35); font-family:var(--sans-en); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink); opacity:.85; }
+.creed .ack b{ font-family:var(--serif-cn); font-weight:700; letter-spacing:.04em; text-transform:none; }
+
+/* === 进场动画 === */
+.reveal{ opacity:0; transform:translateY(20px); transition:opacity .8s ease, transform .8s ease; }
+.reveal.in{ opacity:1; transform:none; }
+
+/* === 响应式 === */
+@media (max-width:900px){
+  .hero{ grid-template-columns:1fr; }
+  .hero-side{ min-height:auto; padding:0; justify-content:flex-start; }
+  .red-ball{ width:90px; height:90px; position:absolute; right:0; top:10px; }
+  .ring{ right:4%; top:2%; opacity:.4; }
+}
+@media (max-width:720px){
+  .wrap{ padding:0 22px; }
+  .ring{ right:0; top:0; opacity:.5; }
+  .skills{ grid-template-columns:1fr; }
+  .skill{ border-right:none; border-bottom:1px solid var(--line); }
+  .skill:last-child{ border-bottom:none; }
+  .proj .item{ grid-template-columns:1fr; gap:8px; }
+  .edu{ grid-template-columns:1fr; gap:22px; }
+  .edu .line{ flex-direction:column; align-items:flex-start; gap:8px; }
+  .edu .status{ margin-left:0; }
+  .edu-photo{ width:110px; height:110px; }
+  .tagline{ font-size:clamp(17px,6vw,32px); }
+  .name .cn{ font-size:clamp(46px,14vw,90px); }
+  .name .en{ font-size:clamp(14px,4vw,22px); }
+  .hero-foot{ flex-direction:column; align-items:flex-start; gap:14px; }
+  .coord{ text-align:left; }
+  .contact{ gap:12px 18px; }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .reveal{ opacity:1; transform:none; transition:none; }
+  .ambient .b, .ring{ animation:none; }
+  .cert:hover, .skill:hover, .contact .cv a:hover, .red-ball:hover{ transform:none; }
+}
+</style>
+</head>
+<body>
+
+<div class="ambient"><span class="b b1"></span><span class="b b2"></span></div>
+<div class="grid-bg"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+
+<nav class="nav wrap">
+  <span class="mark">甘<span class="r">文棣</span></span>
+  <span class="tag">Resume · 2026</span>
+</nav>
+
+<header class="hero wrap reveal" id="hero">
+  <div class="hero-main">
+    <p class="eyebrow">Personal Portfolio · 个人简历</p>
+    <h1 class="name">
+      <span class="cn">甘文棣</span>
+      <span class="en">Gan Wendi</span>
+    </h1>
+
+    <p class="tagline" id="tagline">
+      <span class="en-text">STAY FOOLISH · STAY HUNGRY</span>
+      <span class="cn-text">求知若渴 · 虚怀若谷</span>
+    </p>
+
+    <p class="role">软件工程学生 · 专注 <b>前端设计</b> 与 <b>AI 复合应用</b></p>
+
+    <div class="contact">
+      <div class="ci"><span class="ck">WeChat</span><span class="cv">Ganwendi111</span></div>
+      <div class="ci"><span class="ck">GitHub</span><span class="cv"><a href="#" target="_blank" rel="noopener">@Davidwendi689</a></span></div>
+      <div class="ci"><span class="ck">Tel</span><span class="cv">18138117513</span></div>
+      <div class="ci"><span class="ck">Email</span><span class="cv"><a href="mailto:2112863047@qq.com">2112863047@qq.com</a></span></div>
+    </div>
+
+    <div class="hero-foot">
+      <div class="hftags">
+        <span>前端设计</span><span>代码开发</span><span>AI × 金融</span><span>皮影戏</span>
+      </div>
+      <div class="coord">22.54° N · 114.06° E<br>SHENZHEN</div>
+    </div>
+  </div>
+
+  <div class="hero-side">
+    <div class="red-ball" id="redBall"></div>
+  </div>
+
+  <div class="ring"></div>
+</header>
+
+<!-- 01 教育背景 -->
+<section class="reveal">
+  <div class="wrap">
+    <div class="sec-head"><span class="idx">01</span><h2>教育背景</h2><span class="en">Education</span></div>
+    <div class="edu">
+      <div class="line">
+        <span class="school">广东金融学院</span>
+        <span class="major"><b>软件工程</b> · 学生</span>
+        <span class="status">Undergraduate</span>
+      </div>
+      <div class="edu-photo"><img src="profile-ball.jpg" alt="甘文棣" /></div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 专业技能 -->
+<section class="reveal">
+  <div class="wrap">
+    <div class="sec-head"><span class="idx">02</span><h2>专业技能</h2><span class="en">Skills</span></div>
+    <div class="skills">
+      <div class="skill"><span class="k">Design</span><h3>前端设计</h3><p>页面排版、视觉系统与交互细节，擅长黑红白克制风格。</p></div>
+      <div class="skill"><span class="k">Code</span><h3>代码开发</h3><p>Web 前端与小程序的工程实现，从原型到可运行产品。</p></div>
+      <div class="skill"><span class="k">AI × Finance</span><h3>AI与金融复合</h3><p>将大模型与金融场景结合，搭建知识库与自动化工作流。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 工作 / 实习经历 -->
+<section class="reveal">
+  <div class="wrap">
+    <div class="sec-head"><span class="idx">03</span><h2>工作 / 实习经历</h2><span class="en">Experience</span></div>
+    <div class="xp">
+      <div class="t">粤港澳地区华南高校比赛项目 · 2026年7月 · <b>优秀组员</b></div>
+      <div class="d">统筹跨校团队推进赛事项目，负责方向把控与协作分工。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 项目经历 -->
+<section class="reveal" id="projects">
+  <div class="wrap">
+    <div class="sec-head"><span class="idx">04</span><h2>项目经历</h2><span class="en">Projects</span></div>
+    <div class="proj">
+      <div class="item">
+        <span class="no">01</span>
+        <div>
+          <h3>AI 学习产品 <span class="en">/ WorkBuddy · IMA</span></h3>
+          <p class="desc">基于 <b>WorkBuddy</b> 与 <b>IMA</b> 知识库开发的多项 AI 网页小程序；代表作品以 <b>openAI</b>、<b>Google</b>、<b>Anthropic</b> 开源学习资源设计的 AI 学习产品。</p>
+          <div class="tags"><span>WorkBuddy</span><span>IMA</span><span>openAI</span><span>Google</span><span>Anthropic</span></div>
+        </div>
+      </div>
+      <div class="item">
+        <span class="no">02</span>
+        <div>
+          <h3>RAG 个人知识库搭建 <span class="en">/ RAG</span></h3>
+          <p class="desc">构建个人 <b>RAG</b> 知识库，沉淀学习与实践资料，支持检索增强的生成式问答。</p>
+          <div class="tags"><span>RAG</span><span>Knowledge Base</span></div>
+        </div>
+      </div>
+      <div class="item">
+        <span class="no">03</span>
+        <div>
+          <h3>多款前端游戏 <span class="en">/ Trae</span></h3>
+          <p class="desc">使用 <b>Trae</b> 开发的多款前端小游戏，覆盖交互与动效实现。【待补：游戏名称 / 类型】</p>
+          <div class="tags"><span>Trae</span><span>Game</span></div>
+        </div>
+      </div>
+      <div class="item">
+        <span class="no">04</span>
+        <div>
+          <h3>自动工作流推送 <span class="en">/ Daily Brief</span></h3>
+          <p class="desc">自动化工作流，实现<b>每日前沿科技与商业信息</b>的自动采集与推送。</p>
+          <div class="tags"><span>Automation</span><span>Daily Push</span></div>
+        </div>
+      </div>
+      <div class="item">
+        <span class="no">05</span>
+        <div>
+          <h3>视觉优化网页 <span class="en">/ Gemini · Gamma</span></h3>
+          <p class="desc">利用 <b>Gemini</b> 与 <b>Gamma</b> 进行视觉优化的网页设计，提升版式与呈现质量。</p>
+          <div class="tags"><span>Gemini</span><span>Gamma</span><span>Visual</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 获奖与证书 -->
+<section class="reveal">
+  <div class="wrap">
+    <div class="sec-head"><span class="idx">05</span><h2>获奖与证书</h2><span class="en">Awards</span></div>
+    <div class="awards">
+      <div class="award-line">
+        <span class="t">阿里巴巴达摩院官方 <b>AI 证书</b> ×6</span>
+        <span class="note">下方为横向滚动展示区，图片待补</span>
+      </div>
+      <div class="cert-scroll">
+        <div class="cert"><img src="cert1.jpg" alt="人工智能训练师（高级）" /><span class="ct">Cert 01</span><span class="cm">达摩院 AI 证书</span><span class="cb">高级 · 2026.07</span></div>
+        <div class="cert"><img src="cert2.jpg" alt="人工智能训练师（初级）" /><span class="ct">Cert 02</span><span class="cm">达摩院 AI 证书</span><span class="cb">初级 · 2026.07</span></div>
+        <div class="cert"><img src="cert3.jpg" alt="阿里云 Clouder RAG 应用构建" /><span class="ct">Cert 03</span><span class="cm">阿里云 Clouder</span><span class="cb">RAG 应用构建</span></div>
+        <div class="cert"><img src="cert4.jpg" alt="阿里云 Clouder AIGC 设计基础" /><span class="ct">Cert 04</span><span class="cm">阿里云 Clouder</span><span class="cb">AIGC 设计基础</span></div>
+        <div class="cert"><img src="cert5.jpg" alt="阿里云 Clouder 大模型内容生产" /><span class="ct">Cert 05</span><span class="cm">阿里云 Clouder</span><span class="cb">大模型内容生产</span></div>
+        <div class="cert"><span class="ct">Cert 06</span><span class="cm">达摩院 AI 证书</span><span class="cb">待补</span><span class="ph">Image</span></div>
+      </div>
+      <div class="award-line">
+        <span class="t">市级 <b>皮影戏优秀表演者</b></span>
+        <span class="note">非物质文化遗产表演类荣誉</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="creed">
+  <div class="wrap reveal">
+    <div class="big">秩序 · 设计 · AI</div>
+    <div class="sub">Grid · Type · Motion</div>
+    <div class="foot-contact">
+      <span>WeChat Ganwendi111</span>
+      <span>GitHub @Davidwendi689</span>
+      <span>Tel 18138117513</span>
+      <span>2112863047@qq.com</span>
+    </div>
+    <div class="ack">特别鸣谢 · <b>浩源社区</b></div>
+  </div>
+</footer>
+
+<script>
+/* === 进场淡入 === */
+(function(){
+  var els = document.querySelectorAll('.reveal');
+  if(!('IntersectionObserver' in window)){
+    els.forEach(function(e){ e.classList.add('in'); });
+    return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); }
+    });
+  }, { threshold:0.12 });
+  els.forEach(function(e){ io.observe(e); });
+})();
+
+/* === 专业技能卡片：鼠标靠近闪烁（红底白字 ↔ 白底红字）+ 轻微磁吸 === */
+(function(){
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var skills = document.querySelectorAll('.skill');
+  Array.prototype.forEach.call(skills, function(s){
+    s.addEventListener('mouseenter', function(){ s.classList.add('active'); });
+    s.addEventListener('mouseleave', function(){ s.classList.remove('active'); s.style.transform='translate(0,0)'; });
+    s.addEventListener('mousemove', function(e){
+      var r = s.getBoundingClientRect();
+      var x = (e.clientX - (r.left + r.width/2)) * 0.10;
+      var y = (e.clientY - (r.top + r.height/2)) * 0.10;
+      s.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+    });
+  });
+})();
+
+/* === 联系方式：轻微磁吸 === */
+(function(){
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var cis = document.querySelectorAll('.contact .ci');
+  Array.prototype.forEach.call(cis, function(c){
+    c.addEventListener('mousemove', function(e){
+      var r = c.getBoundingClientRect();
+      var x = (e.clientX - (r.left + r.width/2)) * 0.14;
+      var y = (e.clientY - (r.top + r.height/2)) * 0.14;
+      c.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+    });
+    c.addEventListener('mouseleave', function(){ c.style.transform = 'translate(0,0)'; });
+  });
+})();
+
+/* === 右侧红球：随向下滚动逐渐变大 === */
+(function(){
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var ball = document.getElementById('redBall');
+  if(!ball) return;
+  function onScroll(){
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    var p = h > 0 ? Math.min(window.scrollY / h, 1) : 0;
+    ball.style.setProperty('--bs', (1 + p * 0.35).toFixed(3));
+  }
+  window.addEventListener('scroll', onScroll, { passive:true });
+  onScroll();
+})();
+
+/* === 跟随鼠标红球：项目经历区块起向下方出现，lerp 平滑跟随 === */
+(function(){
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var dot = document.getElementById('cursorDot');
+  var proj = document.getElementById('projects');
+  if(!dot || !proj) return;
+  var tx = window.innerWidth / 2, ty = window.innerHeight / 2;
+  var cx = tx, cy = ty, shown = false;
+  window.addEventListener('mousemove', function(e){ tx = e.clientX; ty = e.clientY; }, { passive:true });
+  function onScroll(){
+    var threshold = proj.offsetTop - window.innerHeight * 0.3;   // 项目经历进入视口前一点即显示
+    var show = (window.scrollY || 0) >= threshold;
+    if(show !== shown){ shown = show; dot.classList.toggle('show', show); }
+  }
+  function loop(){
+    cx += (tx - cx) * 0.18;
+    cy += (ty - cy) * 0.18;
+    dot.style.transform = 'translate(' + cx + 'px,' + cy + 'px) translate(-50%,-50%)';
+    requestAnimationFrame(loop);
+  }
+  window.addEventListener('scroll', onScroll, { passive:true });
+  window.addEventListener('resize', onScroll, { passive:true });
+  onScroll();
+  loop();
+})();
+
+/* === 红字英文行：随首屏下滑，整行向右横向滚动、由英语转为中文，回滚复位 === */
+(function(){
+  var tag = document.getElementById('tagline');
+  if(!tag) return;
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var en = tag.querySelector('.en-text');
+  var cn = tag.querySelector('.cn-text');
+  var raf = null, lastY = -1;
+
+  function apply(){
+    raf = null;
+    var y = window.scrollY || window.pageYOffset || 0;
+    if(y === lastY) return;
+    lastY = y;
+    var range = (window.innerHeight || 800) * 0.5;     // 滚动半屏即完成转换（在教育背景出现前结束）
+    var t = Math.max(0, Math.min(y / range, 1));       // 进度 0→1
+    var dist = (tag.offsetWidth || 300) * 0.65;         // 横向位移量
+
+    // 英文：整行向右移出 + 淡出（t: 0 → 0.42）
+    var eo = Math.min(t / 0.42, 1);
+    en.style.transform = 'translateX(' + (eo * dist) + 'px)';
+    en.style.opacity = (1 - eo).toFixed(3);
+
+    // 中文：由左侧滑入 + 淡入（t: 0.28 → 1），落回原英文位置
+    var co = Math.max(0, Math.min((t - 0.28) / 0.72, 1));
+    cn.style.transform = 'translateX(' + (-(1 - co) * dist) + 'px)';
+    cn.style.opacity = co.toFixed(3);
+  }
+
+  function onScroll(){
+    if(raf === null) raf = requestAnimationFrame(apply);
+  }
+  window.addEventListener('scroll', onScroll, { passive:true });
+  window.addEventListener('resize', onScroll, { passive:true });
+  apply();
+})();
+</script>
+
+</body>
+</html>
